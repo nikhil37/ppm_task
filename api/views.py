@@ -106,7 +106,7 @@ def index(request):
 		elif request.GET['aadhar-status'] == 'false':
 			objs.filter(aadhar__is_active=False)
 		else:
-			return JsonResponse({'success':True,'content':' Invalid parameter'})
+			return JsonResponse({'success':False,'content':' Invalid parameter'})
 	return JsonResponse({'success':True,'content':personal_detail_ser(objs,many=True).data})
 	
 
