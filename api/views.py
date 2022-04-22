@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 from django.conf import settings
 import jwt,json,datetime
+from django.core.exceptions import FieldError
 from api.serializers import *
 
 def login_check(view_func):
@@ -85,7 +86,9 @@ def signin(request):
 @csrf_exempt
 @login_check
 def index(request):
-	if "filter" in request.GET.keys() and "id" in request.GET.keys():
+	if "filter" in request.GET.keys() and "filter_id" not in request.GET.keys():
+		return JsonResponse({'success':False,'content':"'filter_id' parameter required with 'filter"})
+	if "filter" in request.GET.keys() and "filter_id" in request.GET.keys():
 		if request.GET['filter'] == "qualification":
 			objs = personal_detail.objects.filter(qualification__in=[request.GET['filter']])
 		elif request.GET['filter'] == "address":
@@ -99,7 +102,10 @@ def index(request):
 	else:
 		objs = personal_detail.objects.all()
 	if 'sort' in request.GET.keys():
-		objs.order_by(request.GET['sort'])
+		try:
+			objs.order_by(request.GET['sort'])
+		except FieldError:
+			return JsonResponse({'success':True,'content':'Invalid sorting parameter'})
 	if 'aadhar-status' in request.GET.keys():
 		if request.GET['aadhar-status'] == 'true':
 			objs.filter(aadhar__is_active=True)
