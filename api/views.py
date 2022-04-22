@@ -198,7 +198,6 @@ def address_view(request,aadhar_no,obj_id=None):
 		except address.DoesNotExist:
 			return JsonResponse({'success':False,'content':"'id' required"})
 		return JsonResponse({'success':True,'content':'Deleted'})
-	return JsonResponse({"try":True})
 
 @csrf_exempt
 @login_check
